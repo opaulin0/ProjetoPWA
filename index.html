@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- =====================================================
+    META TAGS ESSENCIAIS PARA PWA
+    - theme-color: Colore a barra de status/URL do navegador
+      no Android e em navegadores modernos, reforçando o
+      visual de "app nativo". Deve combinar com o manifest.
+    - description e apple-mobile-web-app: garantem boa
+      experiência no iOS (que tem suporte parcial a PWA).
+  ====================================================== -->
+  <meta name="description" content="TaskFlow — Lista de tarefas PWA com suporte offline." />
+  <meta name="theme-color" content="#0f172a" />
+
+  <!-- iOS / Safari PWA support -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TaskFlow" />
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
+
+  <!-- =====================================================
+    LINK DO WEB APP MANIFEST
+    Este arquivo é o passaporte da PWA: ele diz ao navegador
+    como o app deve se comportar ao ser instalado (nome,
+    ícones, cor, modo de display, etc.).
+  ====================================================== -->
+  <link rel="manifest" href="manifest.json" />
+
+  <link rel="icon" type="image/png" href="icons/icon-192x192.png" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Google Fonts: Sora (display) + JetBrains Mono (monospace accents) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+  <title>TaskFlow — Lista de Tarefas</title>
+</head>
+<body>
+
+  <!-- =====================================================
+    BANNER DE STATUS OFFLINE
+    Exibido via JavaScript quando o navegador perde conexão.
+    É uma feature essencial de UX em PWAs.
+  ====================================================== -->
+  <div id="offline-banner" class="offline-banner hidden" role="alert">
+    <span class="offline-icon">⚡</span>
+    <span>Você está offline — suas tarefas continuam disponíveis.</span>
+  </div>
+
+  <!-- =====================================================
+    BANNER DE INSTALAÇÃO DA PWA
+    Exibido quando o evento `beforeinstallprompt` é capturado,
+    convidando o usuário a instalar o app na tela inicial.
+  ====================================================== -->
+  <div id="install-banner" class="install-banner hidden" role="complementary">
+    <div class="install-banner__text">
+      <strong>Instalar TaskFlow</strong>
+      <span>Adicione à tela inicial para acesso rápido e offline.</span>
+    </div>
+    <div class="install-banner__actions">
+      <button id="btn-install" class="btn btn--install">Instalar</button>
+      <button id="btn-install-dismiss" class="btn btn--ghost-sm" aria-label="Fechar">✕</button>
+    </div>
+  </div>
+
+  <div class="app-wrapper">
+
+    <!-- ── HEADER ─────────────────────────────────────── -->
+    <header class="header">
+      <div class="header__logo">
+        <span class="header__logo-mark">✓</span>
+        <h1 class="header__title">TaskFlow</h1>
+      </div>
+      <span id="pwa-badge" class="header__pwa-badge" title="Progressive Web App">PWA</span>
+    </header>
+
+    <!-- ── MAIN ───────────────────────────────────────── -->
+    <main class="main">
+
+      <!-- Formulário de adição de tarefas -->
+      <section class="add-task-section" aria-label="Adicionar nova tarefa">
+        <div class="input-group">
+          <input
+            type="text"
+            id="task-input"
+            class="task-input"
+            placeholder="Nova tarefa... (Enter para adicionar)"
+            maxlength="120"
+            autocomplete="off"
+            aria-label="Descrição da nova tarefa"
+          />
+          <button id="btn-add" class="btn btn--primary" aria-label="Adicionar tarefa">
+            <span class="btn__icon">+</span>
+            <span class="btn__label">Adicionar</span>
+          </button>
+        </div>
+        <!-- Contador de caracteres -->
+        <div id="char-counter" class="char-counter" aria-live="polite">0 / 120</div>
+      </section>
+
+      <!-- Filtros -->
+      <nav class="filters" aria-label="Filtrar tarefas">
+        <button class="filter-btn active" data-filter="all">Todas</button>
+        <button class="filter-btn" data-filter="pending">Pendentes</button>
+        <button class="filter-btn" data-filter="done">Concluídas</button>
+      </nav>
+
+      <!-- Estatísticas -->
+      <div class="stats" aria-live="polite">
+        <span id="stat-total" class="stat">
+          <strong id="count-total">0</strong> total
+        </span>
+        <span class="stat-divider">·</span>
+        <span id="stat-pending" class="stat stat--pending">
+          <strong id="count-pending">0</strong> pendentes
+        </span>
+        <span class="stat-divider">·</span>
+        <span id="stat-done" class="stat stat--done">
+          <strong id="count-done">0</strong> concluídas
+        </span>
+        <button id="btn-clear-done" class="btn btn--ghost-sm" style="margin-left:auto">
+          Limpar concluídas
+        </button>
+      </div>
+
+      <!-- Lista de tarefas -->
+      <section aria-label="Lista de tarefas">
+        <ul id="task-list" class="task-list" role="list">
+          <!-- Tarefas inseridas dinamicamente pelo app.js -->
+        </ul>
+
+        <!-- Estado vazio -->
+        <div id="empty-state" class="empty-state hidden" aria-live="polite">
+          <div class="empty-state__icon">📋</div>
+          <p class="empty-state__text">Nenhuma tarefa aqui ainda.<br>Que tal adicionar uma?</p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ── FOOTER ─────────────────────────────────────── -->
+    <footer class="footer">
+      <p>TaskFlow · <span class="footer__tech">HTML · CSS · JS · PWA</span></p>
+    </footer>
+
+  </div><!-- /.app-wrapper -->
+
+  <!-- app.js carregado com defer para não bloquear o HTML -->
+  <script src="app.js" defer></script>
+</body>
+</html>

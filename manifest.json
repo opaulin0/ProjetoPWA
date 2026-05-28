@@ -2,7 +2,7 @@
   "name": "TaskFlow — Lista de Tarefas",
   "short_name": "TaskFlow",
   "description": "Uma Progressive Web App de lista de tarefas com suporte offline.",
-  "start_url": "./",
+  "start_url": "https://opaulin0.github.io/ProjetoPWA/",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
